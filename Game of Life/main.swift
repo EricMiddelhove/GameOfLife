@@ -7,10 +7,9 @@
 
 import Foundation
 
-print("Hello, World!")
 
-let xLength = 3
-let yLength = 3
+let xLength = 4
+let yLength = 4
 var inputArray: [[Int]] = Array(repeating: Array(repeating: 0, count: xLength), count: yLength)
 var heatmap = inputArray
 
@@ -35,14 +34,41 @@ func printArray(arr : [[Int]]){
 /**
  converts the inputArray to a heatmap and saves the values inside the heatmap array
  */
-func convertToHeatmap(){
+func convertToHeatmap(arr: [[Int]]){
     
     for i in 0 ... yLength - 1 {
         for j in 0 ... xLength - 1 {
-            heatmap[i][j] = amountOfNeighbours(x: j, y: i)
+            heatmap[i][j] = amountOfNeighbours(arr: arr, x: j, y: i)
         }
     }
     
+}
+
+
+/**
+ Calculates the next iteration of the GameOfLife
+ */
+func evolution(arr: [[Int]]) -> [[Int]]{
+    
+    var newArray = arr
+    
+    for i in 0 ... yLength - 1 {
+        for j in 0 ... xLength - 1 {
+           
+            let amount = amountOfNeighbours(arr: arr,x: j, y: i)
+            
+            if amount == 3 {
+                newArray[i][j] = 1
+            }
+            
+            if !(amount == 3 || amount == 2){
+                newArray[i][j] = 0
+            }
+            
+        }
+    }
+    
+    return newArray
 }
 
 /**
@@ -50,7 +76,7 @@ func convertToHeatmap(){
     * Does not count itself as a neighbour
     * Does not run into an exception when the end of the array is reached
  */
-func amountOfNeighbours(x: Int, y: Int) -> Int{
+func amountOfNeighbours(arr:[[Int]], x: Int, y: Int) -> Int{
     
     var neighbours = 0
     var startCoordinates = (x: x - 1, y: y - 1)
@@ -63,7 +89,7 @@ func amountOfNeighbours(x: Int, y: Int) -> Int{
         for j in startCoordinates.x ... endCoordinates.x {
             
             // has the cell a neighbout && is the cell not me
-            if (inputArray[i][j] == 1 && !(i == y && j == x)) {
+            if (arr[i][j] == 1 && !(i == y && j == x)) {
                 neighbours += 1
             }
             
@@ -95,6 +121,8 @@ func checkCoordinateValidity (c: (x: Int, y: Int)) -> (x: Int, y: Int){
     return coord
 }
 
+
+
 //Main function calls
 
 //Setting the inputs
@@ -107,7 +135,12 @@ print("input")
 printArray(arr: inputArray)
 
 //converting to heatmap
-convertToHeatmap()
+convertToHeatmap(arr: inputArray)
+
+//going to next iteration
+printArray(arr: evolution(arr: inputArray))
+
+
 
 //printing heatmap
 print("heatmap")
