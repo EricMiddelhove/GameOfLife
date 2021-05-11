@@ -5,24 +5,29 @@
 //  Created by Eric Middelhove on 11.05.21.
 //
 
+
+/**
+ 
+    I almost finishef excercise 4, the last thing I wanted to implement was the scrolling of the Array but there was no time for that :) My first plan was to just adjust the size of the array but that is not possible because i can not change the original input array size during the evolution process since all functions use parameters of the original input array and not the public var itself. The next plan was to recalculate the indices but I had no time anymore. :)
+ 
+ */
+
+
 import Foundation
-
-
-
 
 let xLength = 30
 let yLength = 30
-let amountOfEvolutions = 100
+let amountOfEvolutions = 10
 
 var inputArray: [[Int]] = Array(repeating: Array(repeating: 0, count: xLength), count: yLength)
-var heatmap = inputArray
+
 
 
 /**
  Printing the array to the console
  - Parameters:
     - arr: The array that should be printed
-    - beautiful: f beautiful it prints * instead of 1 and " " instead of 0
+    - beautiful: f beautiful it prints * instead of 1 and " " instead of 0 - Do not use beautiful when printing a heatmap
  */
 func printArray(arr : [[Int]], beautiful: Bool){
     
@@ -48,14 +53,15 @@ func printArray(arr : [[Int]], beautiful: Bool){
         - arr: The Array to be printed
         - wrap: If true the array wraps around
  */
-func convertToHeatmap(arr: [[Int]], wrap: Bool){
+func convertToHeatmap(arr: [[Int]], wrap: Bool) -> [[Int]]{
+    var heatmap = Array(repeating: Array(repeating: 0, count: xLength), count: yLength)
     
     for i in 0 ... yLength - 1 {
         for j in 0 ... xLength - 1 {
             heatmap[i][j] = amountOfNeighbours(arr: arr, x: j, y: i, wrap: wrap)
         }
     }
-    
+    return heatmap
 }
 
 
@@ -99,7 +105,8 @@ func evolution(arr: [[Int]], amountOfEvolutions: Int, wrap: Bool, beautiful: Boo
         }
         prevArrays += [newArray]
     }
-    print("Amount of cycles: " + String(prevArrays.count))
+    print("evolution finished")
+    print("Amount of cycles: " + String(prevArrays.count - 1))
     return newArray
 }
 
@@ -165,7 +172,6 @@ func checkCoordinateValidity (c: (x: Int, y: Int), wrap: Bool) -> (x: Int, y: In
         }else{
             coord.y = yLength - 1
         }
-        
     }
     
     return coord
@@ -187,3 +193,9 @@ inputArray[3][3] = 1
 
 //Evolution
 inputArray = evolution(arr: inputArray, amountOfEvolutions: amountOfEvolutions, wrap: true, beautiful: true)
+
+print("final evolution state: ")
+printArray(arr: inputArray, beautiful: true)
+//printing heatmap
+
+printArray(arr: convertToHeatmap(arr: inputArray, wrap: false), beautiful: false)
