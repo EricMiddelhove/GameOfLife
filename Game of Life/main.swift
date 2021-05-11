@@ -65,8 +65,9 @@ func convertToHeatmap(arr: [[Int]], wrap: Bool){
     - wrap: If true the array wraps around
     - arr: The array used as an input for the evolutions
     - amountOfEvolutions: The amount of evolutions that should be done
+    - beautiful: Prints array beautified
  */
-func evolution(arr: [[Int]], amountOfEvolutions: Int, wrap: Bool) -> [[Int]]{
+func evolution(arr: [[Int]], amountOfEvolutions: Int, wrap: Bool, beautiful: Bool) -> [[Int]]{
     
     var newArray = arr
     print(amountOfEvolutions)
@@ -74,7 +75,7 @@ func evolution(arr: [[Int]], amountOfEvolutions: Int, wrap: Bool) -> [[Int]]{
     
     for _ in 0 ... amountOfEvolutions - 1 {
         print("\u{001B}[2J")
-        printArray(arr: newArray, beautiful: true)
+        printArray(arr: newArray, beautiful: beautiful)
         sleep(1)
         
         for i in 0 ... yLength - 1 {
@@ -93,11 +94,12 @@ func evolution(arr: [[Int]], amountOfEvolutions: Int, wrap: Bool) -> [[Int]]{
         
         if prevArrays.contains(newArray){
             print("stop")
+           
             return newArray
         }
         prevArrays += [newArray]
     }
-    
+    print("Amount of cycles: " + String(prevArrays.count))
     return newArray
 }
 
@@ -184,5 +186,4 @@ inputArray[2][3] = 1
 inputArray[3][3] = 1
 
 //Evolution
-inputArray = evolution(arr: inputArray, amountOfEvolutions: amountOfEvolutions, wrap: true)
-
+inputArray = evolution(arr: inputArray, amountOfEvolutions: amountOfEvolutions, wrap: true, beautiful: true)
