@@ -11,8 +11,8 @@ print("Hello, World!")
 
 let xLength = 3
 let yLength = 3
-var array: [[Int]] = Array(repeating: Array(repeating: 0, count: xLength), count: yLength)
-var heatmap = array
+var inputArray: [[Int]] = Array(repeating: Array(repeating: 0, count: xLength), count: yLength)
+var heatmap = inputArray
 
 
 /**
@@ -63,7 +63,7 @@ func amountOfNeighbours(x: Int, y: Int) -> Int{
         for j in startCoordinates.x ... endCoordinates.x {
             
             // has the cell a neighbout && is the cell not me
-            if (array[i][j] == 1 && !(i == y && j == x)) {
+            if (inputArray[i][j] == 1 && !(i == y && j == x)) {
                 neighbours += 1
             }
             
@@ -98,13 +98,13 @@ func checkCoordinateValidity (c: (x: Int, y: Int)) -> (x: Int, y: Int){
 //Main function calls
 
 //Setting the inputs
-array[0][1] = 1
-array[1][1] = 1
-array[2][1] = 1
+inputArray[0][1] = 1
+inputArray[1][1] = 1
+inputArray[2][1] = 1
 
 //printing the input array
 print("input")
-printArray(arr: array)
+printArray(arr: inputArray)
 
 //converting to heatmap
 convertToHeatmap()
