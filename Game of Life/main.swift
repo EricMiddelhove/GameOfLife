@@ -10,6 +10,8 @@ import Foundation
 
 let xLength = 4
 let yLength = 4
+let amountOfEvolutions = 1
+
 var inputArray: [[Int]] = Array(repeating: Array(repeating: 0, count: xLength), count: yLength)
 var heatmap = inputArray
 
@@ -138,10 +140,13 @@ printArray(arr: inputArray)
 convertToHeatmap(arr: inputArray)
 
 //going to next iteration
-printArray(arr: evolution(arr: inputArray))
+for _ in 0 ... amountOfEvolutions - 1 {
+    inputArray = evolution(arr: inputArray)
+    printArray(arr: inputArray)
+}
 
 
 
 //printing heatmap
-print("heatmap")
-printArray(arr: heatmap)
+//print("heatmap")
+//printArray(arr: heatmap)
