@@ -8,9 +8,11 @@
 import Foundation
 
 
-let xLength = 4
-let yLength = 4
-let amountOfEvolutions = 1
+
+
+let xLength = 30
+let yLength = 30
+let amountOfEvolutions = 100
 
 var inputArray: [[Int]] = Array(repeating: Array(repeating: 0, count: xLength), count: yLength)
 var heatmap = inputArray
@@ -18,14 +20,20 @@ var heatmap = inputArray
 
 /**
  Printing the array to the console
-    * param: arr -> The array that should be printed
+ - Parameters:
+    - arr: The array that should be printed
+    - beautiful: f beautiful it prints * instead of 1 and " " instead of 0
  */
-func printArray(arr : [[Int]]){
+func printArray(arr : [[Int]], beautiful: Bool){
     
     var out = ""
     for i in 0 ... yLength-1 {
         for j in 0 ... xLength-1 {
-            out += String(arr[i][j])
+            if beautiful {
+                out += arr[i][j] == 1 ? "*" : " "
+            }else{
+                out += String(arr[i][j])
+            }
         }
         out += "\n"
     }
@@ -35,12 +43,16 @@ func printArray(arr : [[Int]]){
 
 /**
  converts the inputArray to a heatmap and saves the values inside the heatmap array
+   
+    - Parameters:
+        - arr: The Array to be printed
+        - wrap: If true the array wraps around
  */
-func convertToHeatmap(arr: [[Int]]){
+func convertToHeatmap(arr: [[Int]], wrap: Bool){
     
     for i in 0 ... yLength - 1 {
         for j in 0 ... xLength - 1 {
-            heatmap[i][j] = amountOfNeighbours(arr: arr, x: j, y: i)
+            heatmap[i][j] = amountOfNeighbours(arr: arr, x: j, y: i, wrap: wrap)
         }
     }
     
@@ -49,25 +61,41 @@ func convertToHeatmap(arr: [[Int]]){
 
 /**
  Calculates the next iteration of the GameOfLife
+ - Parameters:
+    - wrap: If true the array wraps around
+    - arr: The array used as an input for the evolutions
+    - amountOfEvolutions: The amount of evolutions that should be done
  */
-func evolution(arr: [[Int]]) -> [[Int]]{
+func evolution(arr: [[Int]], amountOfEvolutions: Int, wrap: Bool) -> [[Int]]{
     
     var newArray = arr
+    print(amountOfEvolutions)
+    var prevArrays = [newArray]
     
-    for i in 0 ... yLength - 1 {
-        for j in 0 ... xLength - 1 {
-           
-            let amount = amountOfNeighbours(arr: arr,x: j, y: i)
-            
-            if amount == 3 {
-                newArray[i][j] = 1
+    for _ in 0 ... amountOfEvolutions - 1 {
+        print("\u{001B}[2J")
+        printArray(arr: newArray, beautiful: true)
+        sleep(1)
+        
+        for i in 0 ... yLength - 1 {
+            for j in 0 ... xLength - 1 {
+                let amount = amountOfNeighbours(arr: newArray,x: j, y: i, wrap: wrap)
+                
+                if amount == 3 {
+                    newArray[i][j] = 1
+                }
+                
+                if !(amount == 3 || amount == 2){
+                    newArray[i][j] = 0
+                }
             }
-            
-            if !(amount == 3 || amount == 2){
-                newArray[i][j] = 0
-            }
-            
         }
+        
+        if prevArrays.contains(newArray){
+            print("stop")
+            return newArray
+        }
+        prevArrays += [newArray]
     }
     
     return newArray
@@ -77,18 +105,23 @@ func evolution(arr: [[Int]]) -> [[Int]]{
  Counts the amout of neighbours around a cell
     * Does not count itself as a neighbour
     * Does not run into an exception when the end of the array is reached
+ - Parameters:
+    - wrap: If true the array wraps around
  */
-func amountOfNeighbours(arr:[[Int]], x: Int, y: Int) -> Int{
+func amountOfNeighbours(arr:[[Int]], x: Int, y: Int, wrap: Bool) -> Int{
     
     var neighbours = 0
     var startCoordinates = (x: x - 1, y: y - 1)
     var endCoordinates = (x: x + 1, y: y + 1)
     
-    startCoordinates = checkCoordinateValidity(c: startCoordinates)
-    endCoordinates = checkCoordinateValidity(c: endCoordinates)
+    startCoordinates = checkCoordinateValidity(c: startCoordinates, wrap: wrap)
+    endCoordinates = checkCoordinateValidity(c: endCoordinates, wrap: wrap)
 
-    for i in startCoordinates.y ... endCoordinates.y {
-        for j in startCoordinates.x ... endCoordinates.x {
+    let yRange = startCoordinates.y < endCoordinates.y ? startCoordinates.y ... endCoordinates.y : endCoordinates.y ... startCoordinates.y
+    let xRange = startCoordinates.x < endCoordinates.x ? startCoordinates.x ... endCoordinates.x : endCoordinates.x ... startCoordinates.x
+    
+    for i in yRange {
+        for j in xRange{
             
             // has the cell a neighbout && is the cell not me
             if (arr[i][j] == 1 && !(i == y && j == x)) {
@@ -104,8 +137,12 @@ func amountOfNeighbours(arr:[[Int]], x: Int, y: Int) -> Int{
 /**
     checks if a coordinate is inside of the array boundaries
         * If not it returns the last coordinate inside of the array
+        * If wrap is true the board array wraps around
+    - Parameters:
+        - c: the coordinates that should be checked, formatted as a tupel
+        - wrap: If true the array wraps around
  */
-func checkCoordinateValidity (c: (x: Int, y: Int)) -> (x: Int, y: Int){
+func checkCoordinateValidity (c: (x: Int, y: Int), wrap: Bool) -> (x: Int, y: Int){
     var coord = c
     if coord.x < 0 {
         coord.x = 0
@@ -114,10 +151,19 @@ func checkCoordinateValidity (c: (x: Int, y: Int)) -> (x: Int, y: Int){
         coord.y = 0
     }
     if coord.x > xLength - 1 {
-        coord.x = xLength - 1
+        if wrap {
+            coord.x = coord.x % xLength
+        }else{
+            coord.x = xLength - 1
+        }
     }
     if coord.y > yLength - 1{
-        coord.y = yLength - 1
+        if wrap {
+            coord.y = coord.y % yLength
+        }else{
+            coord.y = yLength - 1
+        }
+        
     }
     
     return coord
@@ -128,25 +174,15 @@ func checkCoordinateValidity (c: (x: Int, y: Int)) -> (x: Int, y: Int){
 //Main function calls
 
 //Setting the inputs
+
 inputArray[0][1] = 1
-inputArray[1][1] = 1
+inputArray[1][2] = 1
+inputArray[2][0] = 1
 inputArray[2][1] = 1
+inputArray[2][2] = 1
+inputArray[2][3] = 1
+inputArray[3][3] = 1
 
-//printing the input array
-print("input")
-printArray(arr: inputArray)
+//Evolution
+inputArray = evolution(arr: inputArray, amountOfEvolutions: amountOfEvolutions, wrap: true)
 
-//converting to heatmap
-convertToHeatmap(arr: inputArray)
-
-//going to next iteration
-for _ in 0 ... amountOfEvolutions - 1 {
-    inputArray = evolution(arr: inputArray)
-    printArray(arr: inputArray)
-}
-
-
-
-//printing heatmap
-//print("heatmap")
-//printArray(arr: heatmap)
